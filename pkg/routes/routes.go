@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/gorilla/mux"
-	"github.com/thakurnishu/mysql-api/pkg/models"
-	"github.com/thakurnishu/mysql-api/pkg/utils"
+	"github.com/thakurnishu/bookstore-api/pkg/models"
+	"github.com/thakurnishu/bookstore-api/pkg/utils"
 )
 
 const (

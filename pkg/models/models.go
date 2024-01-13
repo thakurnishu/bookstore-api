@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/thakurnishu/mysql-api/pkg/db"
+	"github.com/thakurnishu/bookstore-api/pkg/db"
 )
 
 type Book struct {

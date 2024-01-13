@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/thakurnishu/mysql-api/pkg/routes"
+	"github.com/thakurnishu/bookstore-api/pkg/routes"
 )
 
 const (

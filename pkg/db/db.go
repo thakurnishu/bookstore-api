@@ -6,7 +6,7 @@ import (
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/thakurnishu/mysql-api/pkg/utils"
+	"github.com/thakurnishu/bookstore-api/pkg/utils"
 )
 
 var (

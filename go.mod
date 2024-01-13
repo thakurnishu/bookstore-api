@@ -1,4 +1,4 @@
-module github.com/thakurnishu/mysql-api
+module github.com/thakurnishu/bookstore-api
 
 go 1.21.1
 
