@@ -26,8 +26,8 @@ func (s *Server) Run() {
 
 	router := httprouter.New()
 
-	router.HandlerFunc("POST", "/book/register", utils.CustomHTTPHandleFunc(s.HandleRegisterBook))
-	router.HandlerFunc("GET", "/book", utils.CustomHTTPHandleFunc(s.HandleGetBook))
+	router.HandlerFunc(http.MethodPost, "/book/register", utils.CustomHTTPHandleFunc(s.HandleRegisterBook))
+	router.HandlerFunc(http.MethodGet, "/book", utils.CustomHTTPHandleFunc(s.HandleGetBook))
 
 	log.Printf("Server Listen on Port %s\n", s.ListenAddr)
 	log.Fatalln(http.ListenAndServe(s.ListenAddr, router))
