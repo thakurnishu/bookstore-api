@@ -5,7 +5,6 @@ The Bookstore API is a sample REST application that provides a simple way to reg
 ## Perquisites
 - Docker Should be [Installed](https://docs.docker.com/engine/install/)
 - Golang Should be [Installed](https://go.dev/doc/install)
-- Go-Migrate CLI should be [Installed](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate)
 
 ## Run API On Local Machine
 - Clone repo
@@ -13,12 +12,36 @@ The Bookstore API is a sample REST application that provides a simple way to reg
        git clone https://github.com/thakurnishu/bookstore-api.git
        cd bookstore-api
        go mod download #Downlad all dependencies
+- Choose which Database you want to use `postgres` or `mysql`
+- In `main.go` file uncomment store which you want and comment other store
+- Like you want to go with `postgres`, uncomment postgres store and comment mysql store
+     - ```go
+       go
+       func main() {
+
+	      listenAdrr := flag.String("listenAdrr", "3000", "Port where server will listen")
+	      flag.Parse()
+
+	      store, err := storage.NewPostgresStore()
+	      // store, err := storage.NewMySQLStore()
+	      if err != nil {
+		     log.Fatalln(err)
+	      }
+	      if err = store.Init(); err != nil {
+		     log.Fatalln(err)
+	      }
+
+	      server := api.NewServer(*listenAdrr, store)
+	      server.Run()
+
+       }
+       ```
 - To Start Postgres Database [Docker Container]
      -
-       make db-start
-- To Initialize Table
-     - 
-       make migrate-up
+       make postgres-start
+- To Start Mysql Database [Docker Container]
+     -
+       make mysql-start
 - Start API Server
      - 
        make run
@@ -86,9 +109,6 @@ The Bookstore API is a sample REST application that provides a simple way to reg
 ```
 ### CleanUp
 - Stop Server using `ctrl+c`
-- Clear Database
-     -
-       make migrate-down
 - Stop and Delete Postgres Container
      -
        make db-stop
