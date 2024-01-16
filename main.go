@@ -13,7 +13,8 @@ func main() {
 	listenAdrr := flag.String("listenAdrr", "3000", "Port where server will listen")
 	flag.Parse()
 
-	store, err := storage.NewPostgresStore()
+	// store, err := storage.NewPostgresStore()
+	store, err := storage.NewMySQLStore()
 	if err != nil {
 		log.Fatalln(err)
 	}

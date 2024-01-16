@@ -6,17 +6,18 @@ import (
 	"os"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
+
 	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
 	"github.com/thakurnishu/bookstore-api/types"
 	"github.com/thakurnishu/bookstore-api/utils"
 )
 
-type PostgresStore struct {
+type MySQLStore struct {
 	*sql.DB
 }
 
-func NewPostgresStore() (*PostgresStore, error) {
+func NewMySQLStore() (*MySQLStore, error) {
 	godotenv.Load()
 
 	var (
@@ -25,38 +26,38 @@ func NewPostgresStore() (*PostgresStore, error) {
 		dbpassword = os.Getenv("DB_PASSWORD")
 		dbhost     = os.Getenv("DB_HOST")
 		dbport     = os.Getenv("DB_PORT")
-		uri        = fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%s sslmode=disable", dbuser, dbname, dbpassword, dbhost, dbport)
+		uri        = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbuser, dbpassword, dbhost, dbport, dbname)
 	)
 
-	db, err := sql.Open("postgres", uri)
+	db, err := sql.Open("mysql", uri)
 	if err != nil {
-		return nil, fmt.Errorf("opening postgres connection: %s", err.Error())
+		return nil, fmt.Errorf("opening sql connection: %s", err.Error())
 	}
 
 	err = db.Ping()
 	if err != nil {
-		return nil, fmt.Errorf("failed to ping postgres db: %s ", err.Error())
+		return nil, fmt.Errorf("failed to ping sql db: %s ", err.Error())
 	}
 
-	return &PostgresStore{
+	return &MySQLStore{
 		DB: db,
 	}, nil
 }
 
-func (db *PostgresStore) Init() error {
+func (db *MySQLStore) Init() error {
 	return db.createAccountTable()
 }
 
-func (db *PostgresStore) createAccountTable() error {
+func (db *MySQLStore) createAccountTable() error {
 	createTableQuery := `
-	CREATE TABLE IF NOT EXISTS "book" (
-  		"id" serial PRIMARY KEY,
-  		"available" int,
-  		"added_at" timestamp,
-  		"title" varchar NOT NULL,
-  		"author" varchar NOT NULL,
-  		"publication" varchar NOT NULL,
-  		"isbn" bigint UNIQUE NOT NULL
+	CREATE TABLE IF NOT EXISTS book (
+  		id INT AUTO_INCREMENT PRIMARY KEY,
+  		available INT,
+  		added_at TIMESTAMP,
+  		title VARCHAR(255) NOT NULL,
+  		author VARCHAR(255) NOT NULL,
+  		publication VARCHAR(255) NOT NULL,
+  		isbn BIGINT UNIQUE NOT NULL
 	);`
 
 	_, err := db.Exec(createTableQuery)
@@ -66,7 +67,7 @@ func (db *PostgresStore) createAccountTable() error {
 	return nil
 }
 
-func (db *PostgresStore) AddBook(book *types.Book) error {
+func (db *MySQLStore) AddBook(book *types.Book) error {
 	query := `
 	INSERT INTO book (
 			title,
@@ -76,18 +77,17 @@ func (db *PostgresStore) AddBook(book *types.Book) error {
 			available,
 			added_at
 		)
-        values ($1, $2, $3, $4, $5, $6)
+        values (?, ?, ?, ?, ?, ?)
 	`
 
 	_, err := db.Exec(query, book.Title, book.Author, book.Publication, book.Isbn, book.Available, time.Now())
 	if err != nil {
-		// return fmt.Errorf("failed to create account")
 		return err
 	}
 	return nil
 }
 
-func (db *PostgresStore) GetBook() ([]*types.BookResponse, error) {
+func (db *MySQLStore) GetBook() ([]*types.BookResponse, error) {
 
 	rows, err := db.Query("SELECT * FROM book")
 	if err != nil {
@@ -97,10 +97,11 @@ func (db *PostgresStore) GetBook() ([]*types.BookResponse, error) {
 	books := []*types.BookResponse{}
 
 	for rows.Next() {
-		book, err := utils.ScanBookPostgres(rows)
+		book, err := utils.ScanBookMySQL(rows)
 		if err != nil {
 			return nil, err
 		}
+
 		bookResp := utils.BookResp(book)
 
 		books = append(books, bookResp)
@@ -109,17 +110,17 @@ func (db *PostgresStore) GetBook() ([]*types.BookResponse, error) {
 	return books, nil
 }
 
-func (db *PostgresStore) GetBookByTitle(title string) (*types.BookResponse, error) {
+func (db *MySQLStore) GetBookByTitle(title string) (*types.BookResponse, error) {
 
 	bookResp := types.BookResponse{}
 
-	rows, err := db.Query("SELECT * FROM book where title = $1", title)
+	rows, err := db.Query("SELECT * FROM book where title = ?", title)
 	if err != nil {
 		return nil, fmt.Errorf("book doesn't exist")
 	}
 
 	for rows.Next() {
-		book, err := utils.ScanBookPostgres(rows)
+		book, err := utils.ScanBookMySQL(rows)
 		if err != nil {
 			return nil, fmt.Errorf("book doesn't exist")
 		}
