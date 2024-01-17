@@ -14,5 +14,5 @@ echo "Starting Application Deployment ..."
 kubectl apply -f restapi/ns.yml
 kubectl apply -f restapi/secret.yml
 kubectl apply -f restapi/configMap.yml
-# kubectl apply -f restapi/service.yml
+kubectl apply -f restapi/service.yml
 kubectl apply -f restapi/deployment.yml
