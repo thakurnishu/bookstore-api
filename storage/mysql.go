@@ -26,9 +26,11 @@ func NewMySQLStore() (*MySQLStore, error) {
 		dbpassword = os.Getenv("DB_PASSWORD")
 		dbhost     = os.Getenv("DB_HOST")
 		dbport     = os.Getenv("DB_PORT")
-		uri        = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbuser, dbpassword, dbhost, dbport, dbname)
 	)
-
+	if dbport == "" {
+		dbport = "3306"
+	}
+	uri := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbuser, dbpassword, dbhost, dbport, dbname)
 	db, err := sql.Open("mysql", uri)
 	if err != nil {
 		return nil, fmt.Errorf("opening sql connection: %s", err.Error())
