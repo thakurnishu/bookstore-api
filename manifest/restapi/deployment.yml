@@ -16,7 +16,7 @@ spec:
         app: restapi
     spec:
       containers:
-      - image: mahakal0510/bookstore-sql:0.1.0
+      - image: mahakal0510/bookstore-sql:0.1.1
         name: bookstore-sql
         env:
           - name: DB_HOST
