@@ -25,8 +25,11 @@ func NewPostgresStore() (*PostgresStore, error) {
 		dbpassword = os.Getenv("DB_PASSWORD")
 		dbhost     = os.Getenv("DB_HOST")
 		dbport     = os.Getenv("DB_PORT")
-		uri        = fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%s sslmode=disable", dbuser, dbname, dbpassword, dbhost, dbport)
 	)
+	if dbport == "" {
+		dbport = "5432"
+	}
+	uri := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%s sslmode=disable", dbuser, dbname, dbpassword, dbhost, dbport)
 
 	db, err := sql.Open("postgres", uri)
 	if err != nil {
