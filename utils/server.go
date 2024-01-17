@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 
@@ -23,6 +24,7 @@ func CustomHTTPHandleFunc(f types.CustomHandleFunc) func(http.ResponseWriter, *h
 		params := httprouter.ParamsFromContext(r.Context())
 
 		if err := f(w, r, params); err != nil {
+			log.Println(err)
 			WriteJSON(w, http.StatusBadRequest, types.ApiError{
 				Error: err.Error(),
 			})

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"database/sql"
+	"log"
 	"time"
 
 	"github.com/thakurnishu/bookstore-api/types"
@@ -40,6 +41,7 @@ func ScanBookPostgres(rows *sql.Rows) (*types.Book, error) {
 		&book.Publication,
 		&book.Isbn,
 	); err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
@@ -60,11 +62,13 @@ func ScanBookMySQL(rows *sql.Rows) (*types.Book, error) {
 		&book.Publication,
 		&book.Isbn,
 	); err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
 	parsedTime, err := time.Parse("2006-01-02 15:04:05", string(added_at))
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 

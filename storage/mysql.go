@@ -3,6 +3,7 @@ package storage
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -33,11 +34,13 @@ func NewMySQLStore() (*MySQLStore, error) {
 	uri := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbuser, dbpassword, dbhost, dbport, dbname)
 	db, err := sql.Open("mysql", uri)
 	if err != nil {
+		log.Println(err)
 		return nil, fmt.Errorf("opening sql connection: %s", err.Error())
 	}
 
 	err = db.Ping()
 	if err != nil {
+		log.Println(err)
 		return nil, fmt.Errorf("failed to ping sql db: %s ", err.Error())
 	}
 
@@ -64,6 +67,7 @@ func (db *MySQLStore) createAccountTable() error {
 
 	_, err := db.Exec(createTableQuery)
 	if err != nil {
+		log.Println(err)
 		return fmt.Errorf("failed to create table: %s", err.Error())
 	}
 	return nil
@@ -84,6 +88,7 @@ func (db *MySQLStore) AddBook(book *types.Book) error {
 
 	_, err := db.Exec(query, book.Title, book.Author, book.Publication, book.Isbn, book.Available, time.Now())
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 	return nil
@@ -93,6 +98,7 @@ func (db *MySQLStore) GetBook() ([]*types.BookResponse, error) {
 
 	rows, err := db.Query("SELECT * FROM book")
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
@@ -101,6 +107,7 @@ func (db *MySQLStore) GetBook() ([]*types.BookResponse, error) {
 	for rows.Next() {
 		book, err := utils.ScanBookMySQL(rows)
 		if err != nil {
+			log.Println(err)
 			return nil, err
 		}
 
@@ -118,12 +125,14 @@ func (db *MySQLStore) GetBookByTitle(title string) (*types.BookResponse, error) 
 
 	rows, err := db.Query("SELECT * FROM book where title = ?", title)
 	if err != nil {
+		log.Println(err)
 		return nil, fmt.Errorf("book doesn't exist")
 	}
 
 	for rows.Next() {
 		book, err := utils.ScanBookMySQL(rows)
 		if err != nil {
+			log.Println(err)
 			return nil, fmt.Errorf("book doesn't exist")
 		}
 

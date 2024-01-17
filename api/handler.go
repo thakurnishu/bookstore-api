@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -16,12 +17,14 @@ func (s *Server) HandleRegisterBook(w http.ResponseWriter, r *http.Request, para
 
 	bookReq := new(types.BookRequest)
 	if err := json.NewDecoder(r.Body).Decode(bookReq); err != nil {
+		log.Println(err)
 		return err
 	}
 	bookReq = utils.ConvertAllToTitle(bookReq)
 
 	book := utils.NewBook(bookReq)
 	if err := s.store.AddBook(book); err != nil {
+		log.Println(err)
 		return err
 	}
 
@@ -35,6 +38,7 @@ func (s *Server) HandleGetBook(w http.ResponseWriter, r *http.Request, params ht
 	if hasQueryParameter := r.URL.Query().Has("title"); !hasQueryParameter {
 		books, err := s.store.GetBook()
 		if err != nil {
+			log.Println(err)
 			return err
 		}
 
@@ -51,6 +55,7 @@ func (s *Server) HandleGetBookWithTitleQuery(w http.ResponseWriter, r *http.Requ
 
 	bookResp, err := s.store.GetBookByTitle(title)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 

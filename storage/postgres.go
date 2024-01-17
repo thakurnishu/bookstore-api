@@ -3,6 +3,7 @@ package storage
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -33,11 +34,13 @@ func NewPostgresStore() (*PostgresStore, error) {
 
 	db, err := sql.Open("postgres", uri)
 	if err != nil {
+		log.Println(err)
 		return nil, fmt.Errorf("opening postgres connection: %s", err.Error())
 	}
 
 	err = db.Ping()
 	if err != nil {
+		log.Println(err)
 		return nil, fmt.Errorf("failed to ping postgres db: %s ", err.Error())
 	}
 
@@ -64,6 +67,7 @@ func (db *PostgresStore) createAccountTable() error {
 
 	_, err := db.Exec(createTableQuery)
 	if err != nil {
+		log.Println(err)
 		return fmt.Errorf("failed to create table: %s", err.Error())
 	}
 	return nil
@@ -84,6 +88,7 @@ func (db *PostgresStore) AddBook(book *types.Book) error {
 
 	_, err := db.Exec(query, book.Title, book.Author, book.Publication, book.Isbn, book.Available, time.Now())
 	if err != nil {
+		log.Println(err)
 		// return fmt.Errorf("failed to create account")
 		return err
 	}
@@ -94,6 +99,7 @@ func (db *PostgresStore) GetBook() ([]*types.BookResponse, error) {
 
 	rows, err := db.Query("SELECT * FROM book")
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
@@ -102,6 +108,7 @@ func (db *PostgresStore) GetBook() ([]*types.BookResponse, error) {
 	for rows.Next() {
 		book, err := utils.ScanBookPostgres(rows)
 		if err != nil {
+			log.Println(err)
 			return nil, err
 		}
 		bookResp := utils.BookResp(book)
@@ -118,12 +125,14 @@ func (db *PostgresStore) GetBookByTitle(title string) (*types.BookResponse, erro
 
 	rows, err := db.Query("SELECT * FROM book where title = $1", title)
 	if err != nil {
+		log.Println(err)
 		return nil, fmt.Errorf("book doesn't exist")
 	}
 
 	for rows.Next() {
 		book, err := utils.ScanBookPostgres(rows)
 		if err != nil {
+			log.Println(err)
 			return nil, fmt.Errorf("book doesn't exist")
 		}
 
