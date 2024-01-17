@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: restapi
+  name: restapi
+  namespace: restapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: restapi
+  template:
+    metadata:
+      labels:
+        app: restapi
+    spec:
+      containers:
+      - image: mahakal0510/bookstore-sql:0.1.0
+        name: bookstore-sql
+        env:
+          - name: DB_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: restapi-cm
+                key: host
+          - name: DB_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: restapi-cm
+                key: port
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: mysql-db
+                key: sql-db
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: mysql-user
+                key: sql-user
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-password
+                key: sql-password
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"

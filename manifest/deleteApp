@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo "Deleting .."
+
+kubectl delete -f mysql/ns.yml
+kubectl delete -f restapi/ns.yml
